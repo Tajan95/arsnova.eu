@@ -13,7 +13,10 @@ result_dir="$(cd -- "$result_dir" && pwd)"
 node -e 'if (Number(process.versions.node.split(".")[0]) !== 24) throw new Error("Use Node.js 24 for these experiment loaders")'
 if [[ ! -e "$repo_dir/node_modules" ]]; then
   npm install --prefix "$task_dir" --ignore-scripts --no-audit --no-fund
-  ln -s "$task_dir/node_modules" "$repo_dir/node_modules"
+  mkdir -p "$repo_dir/node_modules"
+  for dependency in "$task_dir/node_modules/"*; do
+    ln -s "$dependency" "$repo_dir/node_modules/"
+  done
 fi
 node --test scripts/ci/open-weight-llm-runtime.test.mjs scripts/ci/open-weight-llm-compose-smoke.test.mjs > "$result_dir/existing-runtime-contracts.tap" 2>&1
 node experiments/thema3/3a/build.mjs
